@@ -1,0 +1,38 @@
+name: Chartink Scanner Alert
+
+on:
+  # Runs every 5 minutes, Mon-Fri, roughly 9:00 AM - 3:35 PM IST
+  # (converted to UTC: 3:30 - 10:05). Adjust as you like.
+  schedule:
+    - cron: "*/5 3-10 * * 1-5"
+  # Lets you trigger it manually from the Actions tab to test
+  workflow_dispatch:
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run scanner
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python scanner.py
+
+      - name: Save seen-stocks state back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_stocks.json
+          git diff --quiet --cached || git commit -m "Update seen stocks"
+          git push
