@@ -35,4 +35,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add seen_stocks.json
           git diff --quiet --cached || git commit -m "Update seen stocks"
+          git pull --rebase --autostash origin main
           git push
