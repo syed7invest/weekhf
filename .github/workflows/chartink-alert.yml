@@ -7,7 +7,11 @@ on:
     - cron: "*/5 3-10 * * 1-5"
   # Lets you trigger it manually from the Actions tab to test
   workflow_dispatch:
-
+# Prevent overlapping runs from racing each other when saving seen_stocks.json
+concurrency:
+  group: chartink-scanner-alert
+  cancel-in-progress: false
+  
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
